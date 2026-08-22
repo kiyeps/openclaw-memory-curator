@@ -50,3 +50,22 @@ Final artifact includes `integrations/openclaw-memory-curator.json` for the DKG
 integrations registry (schema at
 `scripts/dkg-integration/dkg-integrations/schema/integration.schema.json`),
 validated by `scripts/validate.mjs`. See DESIGN.md for the entry content.
+
+## Verified example (2026-08-22)
+
+Real ingest against the local DKG node (v10.0.13, testnet):
+
+```bash
+curator status
+# DKG Node: **IRONCLAW** v10.0.13 | Context Graph: openclaw-curator
+# KAs tracked: 120 (WM: 120, SWM: 0, VM: 0)
+
+curator ingest ~/.openclaw/workspace/memory/2026-05.md
+# Found 125 memory files
+# Ingested: 5, Skipped: 119, Errors: 1
+```
+
+5 OpenClaw workspace memory files were converted to Knowledge Assets and
+landed in Working Memory. The single error was a DKG node-level
+`assertionFinalize` seal-partition conflict on an already-existing KA, not a
+curator defect.
