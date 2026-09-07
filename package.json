@@ -1,13 +1,13 @@
 {
   "name": "openclaw-memory-curator",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Curator daemon + CLI bridging OpenClaw workspace memory into DKG V10 WM/SWM/VM",
   "type": "module",
   "bin": {
     "curator": "src/cli.js"
   },
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test test/*.test.js"
   },
   "license": "Apache-2.0"
 }

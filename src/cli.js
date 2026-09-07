@@ -15,6 +15,10 @@ const STATE_DIR = join(homedir(), '.openclaw', 'workspace', 'scripts', 'openclaw
 const STATE_FILE = join(STATE_DIR, 'maturity.json');
 const CG_ID = 'openclaw-curator';
 
+function bindingVal(b, key) {
+  const v = b[key];
+  return typeof v === 'string' ? v : (v && v.value) || '';
+}
 function getDkg() { return new DkgClient({ contextGraphId: CG_ID }); }
 function getTracker() { return new MaturityTracker(STATE_FILE); }
 
@@ -162,7 +166,7 @@ async function cmdRecall(query) {
     const swmRes = await dkg.sparql(swmSparql, { view: 'shared-working-memory' });
     if (swmRes.result && swmRes.result.bindings) {
       for (const b of swmRes.result.bindings) {
-        console.log(`  ${b.s.value} ${b.p.value} ${b.o.value}`);
+        console.log(`  ${bindingVal(b, 's')} ${bindingVal(b, 'p')} ${bindingVal(b, 'o')}`);
       }
       console.log(`SWM total: ${swmRes.result.bindings.length}`);
     }
@@ -173,12 +177,11 @@ async function cmdRecall(query) {
   try {
     console.log('\nWM results:');
     const wmRes = await dkg.sparql(wmSparql, {
-      view: 'working-memory',
-      agentAddress: '0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A'
+      view: 'working-memory'
     });
     if (wmRes.result && wmRes.result.bindings) {
       for (const b of wmRes.result.bindings) {
-        console.log(`  ${b.s.value} ${b.p.value} ${b.o.value}`);
+        console.log(`  ${bindingVal(b, 's')} ${bindingVal(b, 'p')} ${bindingVal(b, 'o')}`);
       }
       console.log(`WM total: ${wmRes.result.bindings.length}`);
     }

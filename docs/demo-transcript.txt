@@ -1,0 +1,32 @@
+$ curator status
+DKG Node: **IRONCLAW** 🔥  ·  codename **Superagent V7** v10.0.15
+Context Graph: openclaw-curator
+KAs tracked: 0
+  WM: 0
+  SWM: 0
+  VM: 0
+
+$ curator ingest
+Found 1 memory files
+Ingested: 1, Skipped: 0, Errors: 0
+
+$ curator list
+demo-note	wm	refs=0	entries=1
+Total: 1
+
+$ curator recall 'demo note'
+SWM results:
+  undefined undefined undefined
+SWM total: 1
+
+WM results:
+  undefined undefined undefined
+WM total: 1
+$ curator recall 'demo note' (after display fix)
+SWM results:
+  urn:demo:mcp:note http://127.0.0.1:7878/title "MCP demo note"
+SWM total: 1
+
+WM results:
+  urn:openclaw:memory:demo-note:0 urn:openclaw:pred:content "The curator demo note: DKG V10 context graph openclaw-curator on Base Sepolia."
+WM total: 1
