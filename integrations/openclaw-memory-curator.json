@@ -3,8 +3,13 @@
   "schemaVersion": "0.1.0",
   "slug": "openclaw-memory-curator",
   "name": "OpenClaw Memory Curator",
-  "description": "Curator daemon and CLI that bridges OpenClaw workspace memory into DKG V10's three-layer verifiable memory system (WM → SWM → VM) with maturity tracking, secret redaction, and deterministic promotion gates.",
-  "category": ["memory", "curation", "working-memory", "knowledge-assets"],
+  "description": "Curator daemon and CLI that bridges OpenClaw workspace memory into DKG V10's three-layer verifiable memory system (WM \u2192 SWM \u2192 VM) with maturity tracking, secret redaction, and deterministic promotion gates.",
+  "category": [
+    "memory",
+    "curation",
+    "working-memory",
+    "knowledge-assets"
+  ],
   "maintainer": {
     "github": "@kiyeps",
     "name": "kiyeps",
@@ -14,10 +19,24 @@
   "commit": "a55f9ae0f82e0d6781b706d15b3bd1f813079880",
   "license": "Apache-2.0",
   "requiresDkgNodeVersion": ">=10.0.0",
-  "memoryLayers": ["WM", "SWM", "VM"],
-  "v10PrimitivesUsed": ["ContextGraph", "KnowledgeAsset", "SubGraph"],
-  "publicInterfacesUsed": ["http-api"],
-  "targetAgents": ["OpenClaw", "generic-CLI", "generic-HTTP"],
+  "memoryLayers": [
+    "WM",
+    "SWM",
+    "VM"
+  ],
+  "v10PrimitivesUsed": [
+    "ContextGraph",
+    "KnowledgeAsset",
+    "SubGraph"
+  ],
+  "publicInterfacesUsed": [
+    "http-api"
+  ],
+  "targetAgents": [
+    "OpenClaw",
+    "generic-CLI",
+    "generic-HTTP"
+  ],
   "install": {
     "kind": "cli",
     "package": "openclaw-memory-curator",
@@ -26,7 +45,9 @@
     "usageHint": "Run 'curator status' to check DKG node health, then 'curator ingest' to load workspace memory into Working Memory."
   },
   "security": {
-    "networkEgress": ["http://127.0.0.1:9200"],
+    "networkEgress": [
+      "http://127.0.0.1:9200"
+    ],
     "writeAuthority": [
       "POST /api/knowledge-assets (create KA)",
       "POST /api/knowledge-assets/:name/wm/write",
@@ -35,9 +56,9 @@
       "POST /api/knowledge-assets/:name/vm/publish (explicit CLI gate only)"
     ],
     "credentialsHandled": [],
-    "notes": "Reads DKG auth token from ~/.dkg/auth.token (line 2, comment lines stripped). Scans OpenClaw workspace memory files (~/.openclaw/workspace/memory/*.md) and redacts obvious secrets (private keys, API tokens, mnemonic phrases) before any quad leaves the process. VM promotion is explicit-only via 'curator publish <ka>' CLI command — never automatic. SWM share uses entities:'all' (seals by default, publish-ready). All HTTP egress restricted to local DKG node at http://127.0.0.1:9200. No third-party services contacted. Zero npm dependencies; uses only Node.js v24 built-ins."
+    "notes": "Reads DKG auth token from ~/.dkg/auth.token (line 2, comment lines stripped). Scans OpenClaw workspace memory files (~/.openclaw/workspace/memory/*.md) and redacts obvious secrets (private keys, API tokens, mnemonic phrases) before any quad leaves the process. ROUND 1 SCOPE JUSTIFICATION: the only declared VM operation (POST /api/knowledge-assets/:name/vm/publish) is the documented end of the WM->SWM->VM promotion path and is reachable exclusively through the explicit interactive 'curator publish <ka>' CLI command (y/n confirmation gate); it is never invoked automatically, never invoked by the daemon loop, and no other VM operation (/endorse, /verify, /update) is declared or used. All Round-1 functionality (ingest, recall, share, list, daemon) operates purely in WM/SWM. The VM declaration is kept for declaration accuracy, not because Round-1 features depend on it. SWM share uses entities:'all' (seals by default, publish-ready). All HTTP egress restricted to the local DKG node at http://127.0.0.1:9200. No third-party services contacted. Zero npm dependencies; uses only Node.js v24 built-ins."
   },
   "trustTier": "community",
-  "promotionPath": "Working Memory artifacts mature to Shared Working Memory via automatic maturity tracking (reference count >= 3 in later memory files, or explicit share: frontmatter tag) or manual 'curator share <ka>' CLI command. SWM share seals assertions by default (EIP-712), making them publish-ready. Verifiable Memory promotion is gated behind explicit 'curator publish <ka>' CLI command with interactive confirmation — never automatic, satisfying the bounty rule that UI endorsement is disallowed. This deterministic WM → SWM → VM pipeline ensures auditable, human-controlled promotion of workspace knowledge into on-chain verifiable form.",
+  "promotionPath": "Working Memory artifacts mature to Shared Working Memory via automatic maturity tracking (reference count >= 3 in later memory files, or explicit share: frontmatter tag) or manual 'curator share <ka>' CLI command. SWM share seals assertions by default (EIP-712), making them publish-ready. Verifiable Memory promotion is gated behind explicit 'curator publish <ka>' CLI command with interactive confirmation \u2014 never automatic, satisfying the bounty rule that UI endorsement is disallowed. This deterministic WM \u2192 SWM \u2192 VM pipeline ensures auditable, human-controlled promotion of workspace knowledge into on-chain verifiable form.",
   "fitNotes": "Advances the LLM-Wiki / autoresearch direction by providing a deterministic, auditable curation layer between agent workspace memory and DKG's verifiable memory system. The first-party OpenClaw adapter only does chat bridge + read-only memory recall; all writes are delegated to the agent via SKILL.md prose (lossy, undisciplined). This curator fills that gap with deterministic ingestion, secret redaction, maturity tracking, and explicit promotion gates. Enables OpenClaw agents to accumulate workspace knowledge (currently ~120 files / ~1 MB in ~/.openclaw/workspace/memory/) with full provenance, automatic SWM promotion when artifacts demonstrate reuse (reference count threshold), and human-gated VM publication for on-chain verification. The maturity tracker's reference-count heuristic surfaces frequently-reused decisions and findings, while the share: frontmatter tag allows explicit curation. All quads use urn:openclaw:memory:<slug>:<idx> subjects (never urn:dkg:file:* or urn:dkg:extraction:*), no per-quad graph field, and share payloads stay under 256 KB. SPARQL recall over WM+SWM views enables agent consumption of curated knowledge."
 }
