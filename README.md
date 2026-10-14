@@ -20,9 +20,9 @@ fills that gap with a deterministic, auditable curation layer.
    endorsement is disallowed; gate is conversational/CLI.)
 4. **Recall** — SPARQL query helper over WM/SWM for OpenClaw agent consumption.
 
-## Runtime facts (verified 2026-08-22)
+## Runtime facts (live local node, Base Sepolia testnet)
 
-- DKG daemon: `http://127.0.0.1:9200` (v10.0.13, edge node, testnet Base Sepolia)
+- DKG daemon: `http://127.0.0.1:9200` (v10.0.19, edge node, testnet Base Sepolia)
 - Auth token: line 2 of `~/.dkg/auth.token` (line 1 is a comment — strip `#` lines)
 - Context graph: `openclaw-curator` (already created, subscribed, synced)
 - WM lifecycle verified end-to-end: create KA -> wm/write -> swm/share (seals
@@ -53,11 +53,11 @@ validated by `scripts/validate.mjs`. See DESIGN.md for the entry content.
 
 ## Verified example (2026-08-22)
 
-Real ingest against the local DKG node (v10.0.13, testnet):
+Real ingest against the local DKG node (v10.0.19, testnet):
 
 ```bash
 curator status
-# DKG Node: **IRONCLAW** v10.0.13 | Context Graph: openclaw-curator
+# DKG Node: **IRONCLAW** v10.0.19 | Context Graph: openclaw-curator
 # KAs tracked: 120 (WM: 120, SWM: 0, VM: 0)
 
 curator ingest ~/.openclaw/workspace/memory/2026-05.md

@@ -10,10 +10,13 @@ import { redactQuads } from './redaction.js';
 import { DkgClient } from './dkg-client.js';
 import { MaturityTracker } from './maturity.js';
 
-const MEMORY_DIR = join(homedir(), '.openclaw', 'workspace', 'memory');
-const STATE_DIR = join(homedir(), '.openclaw', 'workspace', 'scripts', 'openclaw-memory-curator', '.state');
+const MEMORY_DIR = process.env.CURATOR_MEMORY_DIR || join(homedir(), '.openclaw', 'workspace', 'memory');
+// State lives outside the repo by default so a curator run never dirties the
+// working tree. CURATOR_STATE_DIR overrides it for tests and non-default layouts.
+const STATE_DIR = process.env.CURATOR_STATE_DIR ||
+  join(homedir(), '.openclaw', 'workspace', 'scripts', 'openclaw-memory-curator', '.state');
 const STATE_FILE = join(STATE_DIR, 'maturity.json');
-const CG_ID = 'openclaw-curator';
+const CG_ID = process.env.CURATOR_CONTEXT_GRAPH || 'openclaw-curator';
 
 function bindingVal(b, key) {
   const v = b[key];
@@ -130,15 +133,31 @@ async function cmdShare(kaName, { force = false } = {}) {
   console.log('Shared:', JSON.stringify(res, null, 2));
 }
 
-async function cmdPublish(kaName) {
-  const dkg = getDkg();
+async function cmdPublish(kaName, assumeYes = false) {
   const tracker = getTracker();
   const k = tracker.get(kaName);
   if (!k) { console.error('Unknown KA:', kaName); process.exit(1); }
   if (k.status !== 'swm') { console.error('KA not in SWM:', k.status); process.exit(1); }
   console.log(`WARNING: This will publish ${kaName} to Verifiable Memory (on-chain).`);
   console.log('This is an explicit, irreversible action. Gas costs apply.');
-  // In real CLI, would prompt for confirmation here
+  if (!assumeYes) {
+    // Enforce the explicit human gate the security declaration promises: no
+    // publish without an interactive confirmation, or an explicit --yes.
+    if (!process.stdin.isTTY) {
+      console.error('Refusing to publish without confirmation: stdin is not a TTY.');
+      console.error('Re-run interactively, or pass --yes to confirm non-interactively.');
+      process.exit(1);
+    }
+    const { createInterface } = await import('node:readline/promises');
+    const rl = createInterface({ input: process.stdin, output: process.stdout });
+    const answer = (await rl.question(`Type "yes" to publish ${kaName} to Verifiable Memory: `))
+      .trim().toLowerCase();
+    rl.close();
+    if (answer !== 'yes') {
+      console.error('Aborted. KA left in SWM; nothing was published.');
+      process.exit(1);
+    }
+  }
   console.log('Publishing...');
   const res = await dkg.vmPublish(kaName);
   tracker.setStatus(kaName, 'vm');
@@ -231,8 +250,8 @@ switch (cmd) {
     cmdShare(args[0], { force: args.includes('--force') }).catch(e => { console.error(e); process.exit(1); });
     break;
   case 'publish':
-    if (!args[0]) { console.error('Usage: curator publish <ka-name>'); process.exit(1); }
-    cmdPublish(args[0]).catch(e => { console.error(e); process.exit(1); });
+    if (!args[0]) { console.error('Usage: curator publish <ka-name> [--yes]'); process.exit(1); }
+    cmdPublish(args[0], args.includes('--yes')).catch(e => { console.error(e); process.exit(1); });
     break;
   case 'recall':
     if (!args[0]) { console.error('Usage: curator recall "<query>"'); process.exit(1); }

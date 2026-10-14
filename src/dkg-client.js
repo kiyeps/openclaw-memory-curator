@@ -119,6 +119,10 @@ export class DkgClient {
   }
 
   async info() {
-    return this._req('GET', '/api/info').catch(e => ({ error: e.message }));
+    // /api/status carries the full build identity (version + commit); fall back
+    // to the lighter /api/info only when status is unavailable.
+    return this._req('GET', '/api/status')
+      .catch(() => this._req('GET', '/api/info'))
+      .catch(e => ({ error: e.message }));
   }
 }
