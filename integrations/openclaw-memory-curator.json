@@ -51,7 +51,7 @@
       "POST /api/knowledge-assets/{name}/wm/write",
       "POST /api/knowledge-assets/{name}/wm/finalize",
       "POST /api/knowledge-assets/{name}/swm/share",
-      "POST /api/knowledge-assets/{name}/vm/publish (explicit CLI gate only)"
+      "POST /api/knowledge-assets/{name}/vm/publish (explicit interactive CLI gate only; not reachable from any Round-1 flow)"
     ],
     "credentialsHandled": [],
     "notes": "Reads DKG auth token from ~/.dkg/auth.token (line 2, comment lines stripped). Scans OpenClaw workspace memory files (~/.openclaw/workspace/memory/*.md) and redacts obvious secrets (private keys, API tokens, mnemonic phrases) before any quad leaves the process. No external network egress: the only host contacted is the DKG node it is installed against (127.0.0.1 by default), which the registry contract does not count as egress. ROUND 1 SCOPE: the only declared VM operation reachable solely through the interactive 'curator publish <ka>' command with a y/n confirmation; it is never automatic and all Round-1 flows (ingest, recall, list, share, daemon) operate purely in WM/SWM."
