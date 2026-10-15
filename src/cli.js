@@ -8,6 +8,7 @@ import { homedir } from 'node:os';
 import { parseFileFromDisk, slugify } from './parser.js';
 import { redactQuads } from './redaction.js';
 import { DkgClient } from './dkg-client.js';
+import { writeKaSequence } from './ka-writer.js';
 import { MaturityTracker } from './maturity.js';
 
 const MEMORY_DIR = process.env.CURATOR_MEMORY_DIR || join(homedir(), '.openclaw', 'workspace', 'memory');
@@ -52,7 +53,6 @@ async function cmdIngest({ full = false } = {}) {
   for (const f of files) {
     const fp = join(MEMORY_DIR, f);
     const baseSlug = slugify(fp);
-    const slug = full ? `${baseSlug}-${ts}` : baseSlug;
     const st = statSync(fp);
     const existing = tracker.get(baseSlug);
 
@@ -60,6 +60,13 @@ async function cmdIngest({ full = false } = {}) {
       skipped++;
       continue;
     }
+
+    // Re-ingesting CHANGED data must use a unique (timestamped) name so the
+    // DKG node does not collide with the previously sealed KA ("private/public
+    // partition differs from its existing seal"). First ingest keeps the clean
+    // baseSlug. `ingest --full` always timestamps.
+    const changed = existing && existing.mtimeMs < st.mtimeMs;
+    const slug = (full || changed) ? `${baseSlug}-${ts}` : baseSlug;
 
     try {
       const { quads, shareTag, entryCount } = parseFileFromDisk(fp);
@@ -73,12 +80,10 @@ async function cmdIngest({ full = false } = {}) {
         batches.push(redacted.slice(i, i + batchSize));
       }
 
-      // Create KA with first batch, then write additional batches
+      // Draft -> append -> finalize, with discard-on-failure so a failed
+      // ingest can never leave a partial KA behind. See src/ka-writer.js.
       if (batches.length > 0) {
-        await dkg.createKA(slug, batches[0]);
-        for (let i = 1; i < batches.length; i++) {
-          await dkg.wmWrite(slug, batches[i]);
-        }
+        await writeKaSequence(dkg, slug, batches);
       }
 
       tracker.upsert(baseSlug, {
@@ -87,12 +92,13 @@ async function cmdIngest({ full = false } = {}) {
         mtimeMs: st.mtimeMs,
         size: st.size,
         sourceFile: fp,
+        slug,
       });
       allSlugs.push(baseSlug);
       fileContents[baseSlug] = readFileSync(fp, 'utf8');
       ingested++;
     } catch (e) {
-      console.error(`  ERROR ${slug}: ${e.message}`);
+      console.error(`  ERROR ${slug}: ${e.message}${e.discarded ? ' (partial KA discarded)' : ''}${e.discardError ? ` (discard failed: ${e.discardError})` : ''}`);
       errors++;
     }
   }
@@ -126,8 +132,9 @@ async function cmdShare(kaName, { force = false } = {}) {
     console.error('KA not SWM-eligible. Use --force to override.');
     process.exit(1);
   }
-  console.log(`Sharing ${kaName} to SWM...`);
-  const res = await dkg.swmShare(kaName);
+  const nodeKa = k.slug || k.name; // actual node KA (timestamped on re-ingest)
+  console.log(`Sharing ${nodeKa} to SWM...`);
+  const res = await dkg.swmShare(nodeKa);
   tracker.setStatus(kaName, 'swm');
   tracker.save();
   console.log('Shared:', JSON.stringify(res, null, 2));
@@ -196,7 +203,8 @@ async function cmdRecall(query) {
   try {
     console.log('\nWM results:');
     const wmRes = await dkg.sparql(wmSparql, {
-      view: 'working-memory'
+      view: 'working-memory',
+      agentAddress: '0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A'
     });
     if (wmRes.result && wmRes.result.bindings) {
       for (const b of wmRes.result.bindings) {
@@ -219,13 +227,14 @@ async function cmdDaemon() {
     const dkg = getDkg();
     for (const k of tracker.list()) {
       if (tracker.swmEligible(k.name)) {
-        console.log(`Auto-sharing ${k.name} to SWM`);
+        const nodeKa = k.slug || k.name; // actual node KA (timestamped on re-ingest)
+        console.log(`Auto-sharing ${nodeKa} to SWM`);
         try {
-          await dkg.swmShare(k.name);
+          await dkg.swmShare(nodeKa);
           tracker.setStatus(k.name, 'swm');
           tracker.save();
         } catch (e) {
-          console.error(`  ERROR sharing ${k.name}: ${e.message}`);
+          console.error(`  ERROR sharing ${nodeKa}: ${e.message}`);
         }
       }
     }

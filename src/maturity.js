@@ -17,7 +17,7 @@ export class MaturityTracker {
   }
   save() { writeFileSync(this.path, JSON.stringify(this.state, null, 2)); }
 
-  upsert(kaName, { entryCount, shareTag, mtimeMs, size, sourceFile }) {
+  upsert(kaName, { entryCount, shareTag, mtimeMs, size, sourceFile, slug }) {
     const cur = this.state.kas[kaName] || {
       name: kaName, status: 'wm', referenceCount: 0,
       shareTag: false, entryCount: 0, lastIngested: null,
@@ -27,6 +27,7 @@ export class MaturityTracker {
     cur.mtimeMs = mtimeMs;
     cur.size = size;
     cur.sourceFile = sourceFile;
+    cur.slug = slug || kaName; // actual node KA name (timestamped on re-ingest)
     cur.lastIngested = new Date().toISOString();
     this.state.kas[kaName] = cur;
   }

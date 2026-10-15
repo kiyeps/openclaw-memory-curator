@@ -95,6 +95,15 @@ export class DkgClient {
     });
   }
 
+  // Rollback of a KA's WM assertion. Idempotent: an already-discarded KA still
+  // answers {"discarded":true}; an unresolvable name answers 500
+  // LEGACY_KA_READ_ONLY (guard runs before the existence check) = "not a live KA".
+  async wmDiscard(kaName) {
+    return this._req('POST', `/api/knowledge-assets/${encodeURIComponent(kaName)}/wm/discard`, {
+      contextGraphId: this.cg,
+    });
+  }
+
   async swmShare(kaName, { entities = 'all' } = {}) {
     return this._req('POST', `/api/knowledge-assets/${encodeURIComponent(kaName)}/swm/share`, {
       contextGraphId: this.cg,
