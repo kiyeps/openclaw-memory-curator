@@ -64,6 +64,15 @@ validated by the registry's `scripts/validate.mjs`. See DESIGN.md for the entry 
 
 The current recorded run against a live local node is in `docs/demo-transcript.txt`.
 
+## Recorded walkthrough
+
+`docs/demo.gif` is a recorded walkthrough of this integration against a live local
+DKG V10 node (raw recording: `docs/demo.cast`, asciinema v2 format).
+`docs/demo-transcript.txt` is the exact terminal output of that same run.
+
+![recorded walkthrough](docs/demo.gif)
+
+
 ## Verified example (2026-08-22)
 
 Real ingest against the local DKG node (v10.0.19, testnet):

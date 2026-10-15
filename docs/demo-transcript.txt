@@ -1,48 +1,74 @@
 DKG V10 Round-1 submission: openclaw-memory-curator
-Live demo transcript, recorded 2026-10-15 (Asia/Jakarta) against a live local DKG V10 node.
+Recorded walkthrough transcript, generated 2026-10-15 13:11 WIB
+
+This file is the exact terminal output of the recorded run shipped in
+docs/demo.gif (raw recording: docs/demo.cast, asciinema v2 format).
+One run produced all three artefacts: the GIF, the cast and this transcript.
 
 Environment
-  node: IRONCLAW (codename Superagent V7) v10.0.19, edge node, Base Sepolia testnet
+  node: IRONCLAW v10.0.19 (edge node, DKG V10 Base Testnet / Base Sepolia)
+  node endpoint: http://127.0.0.1:9200 (auth token: ~/.dkg/auth.token, line 2)
   context graph: openclaw-curator
-  repo commit: be3f524cb7e9145b40610760f35d110d01d264bb
-  demo corpus: CURATOR_MEMORY_DIR=/home/chovy/curator-demo-memory (one markdown note)
+  demo input: /home/chovy/curator-demo-live (a fresh note is created and ingested on every run)
+  recorded: 2026-10-15 13:11 WIB
 
-Every command and response below is verbatim output from this run.
+Command output
 
-$ node src/cli.js status
-DKG Node: **IRONCLAW** v10.0.19
+[?2004h$ cd /home/chovy/openclaw-memory-curator
+[?2004l
+[?2004h$ echo "=== openclaw-memory-curator live walkthrough vs DKG V10 node ==="
+[?2004l
+=== openclaw-memory-curator live walkthrough vs DKG V10 node ===
+[?2004h$ node src/cli.js status
+[?2004l
+DKG Node: **IRONCLAW** 🔥  ·  codename **Superagent V7** v10.0.19
 Context Graph: openclaw-curator
-KAs tracked: 272
-  WM: 263
-  SWM: 9
-  VM: 0
-
-$ CURATOR_MEMORY_DIR=/home/chovy/curator-demo-memory node src/cli.js ingest
+KAs tracked: [33m274[39m
+  WM: [33m264[39m
+  SWM: [33m10[39m
+  VM: [33m0[39m
+[?2004h$ export CURATOR_MEMORY_DIR=/home/chovy/curator-demo-live
+[?2004l
+[?2004h$ mkdir -p $CURATOR_MEMORY_DIR
+[?2004l
+[?2004h$ rm -f $CURATOR_MEMORY_DIR/*.md
+[?2004l
+[?2004h$ KA=live-demo-$(date +%H%M%S)
+[?2004l
+[?2004h$ echo "The curator live demo note: DKG V10 context graph openclaw-curator on Base Sepolia testnet." > $CURATOR_MEMORY_DIR/$KA.md
+[?2004l
+[?2004h$ cat $CURATOR_MEMORY_DIR/$KA.md
+[?2004l
+The curator live demo note: DKG V10 context graph openclaw-curator on Base Sepolia testnet.
+[?2004h$ node src/cli.js ingest
+[?2004l
 Found 1 memory files
 Ingested: 1, Skipped: 0, Errors: 0
-
-$ node src/cli.js list    (output filtered to the demo KA)
-demo-note-20261015	wm	refs=0	entries=2
-
-$ node src/cli.js share demo-note-20261015 --force
-Sharing demo-note-20261015 to SWM...
+[?2004h$ node src/cli.js list | grep "$KA"
+[?2004l
+live-demo-130555	wm	refs=0	entries=1
+[?2004h$ node src/cli.js share "$KA"
+[?2004l
+KA not SWM-eligible. Use --force to override.
+[?2004h$ node src/cli.js share "$KA" --force
+[?2004l
+Sharing live-demo-130555 to SWM...
 Shared: {
   "swmShared": true,
-  "promotedCount": 10,
+  "promotedCount": 8,
   "sealed": true,
   "publishReady": true,
-  "shareOperationId": "mv91zd02-stekem"
+  "shareOperationId": "mv94y389-phowj1"
 }
-
-$ node src/cli.js recall "curator demo"
+[?2004h$ node src/cli.js list | grep "$KA"
+[?2004l
+live-demo-130555	swm	refs=0	entries=1
+[?2004h$ node src/cli.js recall "$KA"
+[?2004l
 SWM results:
-  urn:openclaw:memory:demo-note-20261015:0 urn:openclaw:pred:content "The curator demo note: DKG V10 context graph openclaw-curator on Base Sepolia testnet."
+  urn:openclaw:memory:live-demo-130555 urn:openclaw:pred:sourceFile "/home/chovy/curator-demo-live/live-demo-130555.md"
 SWM total: 1
 
 WM results:
-  urn:openclaw:memory:demo-note:0 urn:openclaw:pred:content "The curator demo note: DKG V10 context graph openclaw-curator on Base Sepolia."
-WM total: 1
-
-Note: an earlier revision of this transcript captured a display bug (binding values printed as
-"undefined") and a hand-noted "after display fix" block. That bug is fixed in the source
-(src/cli.js bindingVal handles both binding shapes); the block above is the current, clean run.
+WM total: 0
+[?2004h$ 
