@@ -1,32 +1,48 @@
-$ curator status
-DKG Node: **IRONCLAW** 🔥  ·  codename **Superagent V7** v10.0.15
+DKG V10 Round-1 submission: openclaw-memory-curator
+Live demo transcript, recorded 2026-10-15 (Asia/Jakarta) against a live local DKG V10 node.
+
+Environment
+  node: IRONCLAW (codename Superagent V7) v10.0.19, edge node, Base Sepolia testnet
+  context graph: openclaw-curator
+  repo commit: 9f4f385baca99c091212bb1c8325f3cc0f714272
+  demo corpus: CURATOR_MEMORY_DIR=/home/chovy/curator-demo-memory (one markdown note)
+
+Every command and response below is verbatim output from this run.
+
+$ node src/cli.js status
+DKG Node: **IRONCLAW** v10.0.19
 Context Graph: openclaw-curator
-KAs tracked: 0
-  WM: 0
-  SWM: 0
+KAs tracked: 272
+  WM: 263
+  SWM: 9
   VM: 0
 
-$ curator ingest
+$ CURATOR_MEMORY_DIR=/home/chovy/curator-demo-memory node src/cli.js ingest
 Found 1 memory files
 Ingested: 1, Skipped: 0, Errors: 0
 
-$ curator list
-demo-note	wm	refs=0	entries=1
-Total: 1
+$ node src/cli.js list    (output filtered to the demo KA)
+demo-note-20261015	wm	refs=0	entries=2
 
-$ curator recall 'demo note'
-SWM results:
-  undefined undefined undefined
-SWM total: 1
+$ node src/cli.js share demo-note-20261015 --force
+Sharing demo-note-20261015 to SWM...
+Shared: {
+  "swmShared": true,
+  "promotedCount": 10,
+  "sealed": true,
+  "publishReady": true,
+  "shareOperationId": "mv91zd02-stekem"
+}
 
-WM results:
-  undefined undefined undefined
-WM total: 1
-$ curator recall 'demo note' (after display fix)
+$ node src/cli.js recall "curator demo"
 SWM results:
-  urn:demo:mcp:note http://127.0.0.1:7878/title "MCP demo note"
+  urn:openclaw:memory:demo-note-20261015:0 urn:openclaw:pred:content "The curator demo note: DKG V10 context graph openclaw-curator on Base Sepolia testnet."
 SWM total: 1
 
 WM results:
   urn:openclaw:memory:demo-note:0 urn:openclaw:pred:content "The curator demo note: DKG V10 context graph openclaw-curator on Base Sepolia."
 WM total: 1
+
+Note: an earlier revision of this transcript captured a display bug (binding values printed as
+"undefined") and a hand-noted "after display fix" block. That bug is fixed in the source
+(src/cli.js bindingVal handles both binding shapes); the block above is the current, clean run.

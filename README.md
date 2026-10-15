@@ -8,6 +8,17 @@ bridge + read-only memory recall; all writes are delegated to the agent via
 SKILL.md (the agent must discipline itself to call HTTP routes). This project
 fills that gap with a deterministic, auditable curation layer.
 
+## Install
+
+```bash
+npm install -g openclaw-memory-curator
+# or without installing:
+npx --package openclaw-memory-curator curator status
+```
+
+The package ships one executable, `curator`. The registry entry is
+`integrations/openclaw-memory-curator.json`.
+
 ## What it does
 
 1. **Ingest** — scan OpenClaw workspace `memory/*.md` files, convert them to
@@ -48,8 +59,10 @@ fills that gap with a deterministic, auditable curation layer.
 
 Final artifact includes `integrations/openclaw-memory-curator.json` for the DKG
 integrations registry (schema at
-`scripts/dkg-integration/dkg-integrations/schema/integration.schema.json`),
-validated by `scripts/validate.mjs`. See DESIGN.md for the entry content.
+`https://github.com/OriginTrail/dkg-integrations/blob/main/schema/integration.schema.json`),
+validated by the registry's `scripts/validate.mjs`. See DESIGN.md for the entry content.
+
+The current recorded run against a live local node is in `docs/demo-transcript.txt`.
 
 ## Verified example (2026-08-22)
 
