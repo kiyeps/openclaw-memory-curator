@@ -35,7 +35,7 @@ memory/*.md → parser.js → redaction.js → dkg-client.js → DKG node (WM/SW
 - DKG node: `http://127.0.0.1:9200` (v10.0.19, edge node, testnet Base Sepolia)
 - Auth token: line 2 of `~/.dkg/auth.token`
 - Context graph: `openclaw-curator`
-- Source corpus: `~/.openclaw/workspace/memory/*.md` (~120 files, ~1 MB)
+- Source corpus: `~/.openclaw/workspace/memory/*.md` (272 files)
 
 ## Build & Test
 

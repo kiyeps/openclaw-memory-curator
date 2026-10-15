@@ -36,8 +36,18 @@ The package ships one executable, `curator`. The registry entry is
 - DKG daemon: `http://127.0.0.1:9200` (v10.0.19, edge node, testnet Base Sepolia)
 - Auth token: line 2 of `~/.dkg/auth.token` (line 1 is a comment — strip `#` lines)
 - Context graph: `openclaw-curator` (already created, subscribed, synced)
-- WM lifecycle verified end-to-end: create KA -> wm/write -> swm/share (seals
-  by default, EIP-712) -> SPARQL recall on `shared-working-memory` view works
+- WM lifecycle verified end-to-end: create KA (draft) -> wm/write -> wm/finalize
+  -> swm/share (seals by default, EIP-712) -> SPARQL recall on
+  `shared-working-memory` view works
+- **Write sequence (v10.0.19)**: the node seals an assertion at creation time,
+  so `POST /api/knowledge-assets` WITH quads returns `wm-sealed` and every later
+  `wm/write` is rejected with `409 KA_ASSERTION_ALREADY_FINALIZED`. Always
+  `createKA(name, [])` -> `wmWrite(name, quads)` per batch -> `wmFinalize(name)`.
+  `src/ka-writer.js` (`writeKaSequence`) owns this and discards the partial KA
+  when any step fails, so a failed ingest leaves no residue.
+- `wm/discard` is an idempotent rollback of a KA's WM assertion (measured: 50
+  quads removed per call). A name that does not resolve answers
+  `500 LEGACY_KA_READ_ONLY` = "not a live KA", not a permission error.
 - Quads format: JSON array of `{subject, predicate, object}` — NO per-quad `graph` field
 - WM SPARQL view requires `agentAddress`; SWM/VM views do not
 - Full `swm/share` (`entities: "all"`) seals by default => publish-ready
@@ -47,7 +57,7 @@ The package ships one executable, `curator`. The registry entry is
 
 ## Source corpus
 
-- `~/.openclaw/workspace/memory/*.md` — ~120 files, ~1 MB total.
+- `~/.openclaw/workspace/memory/*.md` — 272 files, ~1 MB total.
   Timestamped session logs (`2026-07-21-1701.md`) + daily digests (`2026-07-21.md`).
   Format: markdown with `[HH:MM WIB] [type] context | decision | next` entries.
 - `~/.openclaw/workspace/MEMORY.md` — long-term durable memory.

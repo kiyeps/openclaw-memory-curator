@@ -147,10 +147,10 @@ node scripts/validate.mjs /home/chovy/.openclaw/workspace/scripts/openclaw-memor
 ## Runtime Environment
 
 - Node.js v24 (uses native fetch, node:test)
-- DKG node: `http://127.0.0.1:9200` (v10.0.13)
+- DKG node: `http://127.0.0.1:9200` (v10.0.19)
 - Auth token: `~/.dkg/auth.token` line 2
 - Context graph: `openclaw-curator`
-- Source corpus: `~/.openclaw/workspace/memory/*.md` (~120 files)
+- Source corpus: `~/.openclaw/workspace/memory/*.md` (272 files)
 
 ## Zero Dependencies
 
