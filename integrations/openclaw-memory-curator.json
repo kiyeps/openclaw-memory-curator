@@ -3,7 +3,7 @@
   "schemaVersion": "0.1.0",
   "slug": "openclaw-memory-curator",
   "name": "OpenClaw Memory Curator",
-  "description": "Curator daemon and CLI that bridges OpenClaw workspace memory into DKG V10's three-layer verifiable memory system (WM → SWM → VM) with maturity tracking, secret redaction, and deterministic promotion gates.",
+  "description": "Curator daemon and CLI that bridges OpenClaw workspace memory into DKG V10's three-layer verifiable memory system (WM \u2192 SWM \u2192 VM) with maturity tracking, secret redaction, and deterministic promotion gates.",
   "category": [
     "memory",
     "curation",
@@ -16,7 +16,7 @@
     "contact": "https://github.com/kiyeps"
   },
   "repo": "https://github.com/kiyeps/openclaw-memory-curator",
-  "commit": "be3f524cb7e9145b40610760f35d110d01d264bb",
+  "commit": "a595a809b354dd561720534cb0f223a922226f39",
   "license": "Apache-2.0",
   "requiresDkgNodeVersion": ">=10.0.0",
   "memoryLayers": [
@@ -59,6 +59,6 @@
   "trustTier": "community",
   "promotionPath": "Working Memory artifacts mature to Shared Working Memory when SWM-eligible: reference count >= 3 in later memory files, or an explicit 'share:' frontmatter tag. The daemon's periodic tick (default 5 minutes) auto-shares eligible KAs; swm/share seals by default, making them publish-ready. 'curator share <ka>' remains available for explicit promotion. Verifiable Memory promotion is gated behind the interactive 'curator publish <ka>' CLI command with a y/n confirmation - never automatic. This deterministic WM -> SWM -> VM pipeline keeps promotion auditable and human-controlled.",
   "fitNotes": "Advances the LLM-Wiki / autoresearch direction with a deterministic, auditable curation layer between agent workspace memory and DKG memory. First-party adapter work focuses on chat-turn memory; this curator instead ingests the agent's long-lived workspace memory files (Markdown) as provenance-tagged KAs with a maturity lifecycle, secret redaction, and deterministic promotion.",
-  "demo": "https://github.com/kiyeps/openclaw-memory-curator/blob/main/docs/demo-transcript.txt",
+  "demo": "https://github.com/kiyeps/openclaw-memory-curator/blob/main/docs/demo.gif",
   "designBrief": "https://github.com/kiyeps/openclaw-memory-curator/blob/main/docs/DESIGN.md"
 }
