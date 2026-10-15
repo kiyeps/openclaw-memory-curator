@@ -4,7 +4,7 @@ Live demo transcript, recorded 2026-10-15 (Asia/Jakarta) against a live local DK
 Environment
   node: IRONCLAW (codename Superagent V7) v10.0.19, edge node, Base Sepolia testnet
   context graph: openclaw-curator
-  repo commit: 9f4f385baca99c091212bb1c8325f3cc0f714272
+  repo commit: be3f524cb7e9145b40610760f35d110d01d264bb
   demo corpus: CURATOR_MEMORY_DIR=/home/chovy/curator-demo-memory (one markdown note)
 
 Every command and response below is verbatim output from this run.
