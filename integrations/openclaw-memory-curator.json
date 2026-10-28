@@ -3,7 +3,7 @@
   "schemaVersion": "0.1.0",
   "slug": "openclaw-memory-curator",
   "name": "OpenClaw Memory Curator",
-  "description": "Curator daemon and CLI that bridges OpenClaw workspace memory into DKG V10's three-layer verifiable memory system (WM \u2192 SWM \u2192 VM) with maturity tracking, secret redaction, and deterministic promotion gates.",
+  "description": "Curator daemon and CLI that bridges OpenClaw workspace memory into DKG V10's three-layer verifiable memory system (WM → SWM → VM) with maturity tracking, secret redaction, and deterministic promotion gates.",
   "category": [
     "memory",
     "curation",
@@ -16,7 +16,7 @@
     "contact": "https://github.com/kiyeps"
   },
   "repo": "https://github.com/kiyeps/openclaw-memory-curator",
-  "commit": "a595a809b354dd561720534cb0f223a922226f39",
+  "commit": "a14bd1a",
   "license": "Apache-2.0",
   "requiresDkgNodeVersion": ">=10.0.0",
   "memoryLayers": [
@@ -54,7 +54,7 @@
       "POST /api/knowledge-assets/{name}/vm/publish (explicit interactive CLI gate only; not reachable from any Round-1 flow)"
     ],
     "credentialsHandled": [],
-    "notes": "Reads DKG auth token from ~/.dkg/auth.token (line 2, comment lines stripped). Scans OpenClaw workspace memory files (~/.openclaw/workspace/memory/*.md) and redacts obvious secrets (private keys, API tokens, mnemonic phrases) before any quad leaves the process. No external network egress: the only host contacted is the DKG node it is installed against (127.0.0.1 by default), which the registry contract does not count as egress. ROUND 1 SCOPE: the only declared VM operation reachable solely through the interactive 'curator publish <ka>' command with a y/n confirmation; it is never automatic and all Round-1 flows (ingest, recall, list, share, daemon) operate purely in WM/SWM."
+    "notes": "Reads DKG auth token from ~/.dkg/auth.token (line 2, comment lines stripped). Scans OpenClaw workspace memory files (~/.openclaw/workspace/memory/*.md) and redacts obvious secrets (private keys, API tokens, mnemonic phrases) before any quad leaves the process. Outbound endpoint guard: any non-loopback DKG endpoint must use https and must be opted into via DKG_ALLOW_REMOTE_ENDPOINT=1; loopback http is allowed for a local node. The guard runs before the auth token is loaded, so a rejected endpoint never reaches credential-loading code. ROUND 1 SCOPE: the only declared VM operation reachable solely through the interactive 'curator publish <ka>' command with a y/n confirmation; it is never automatic and all Round-1 flows (ingest, recall, list, share, daemon) operate purely in WM/SWM."
   },
   "trustTier": "community",
   "promotionPath": "Working Memory artifacts mature to Shared Working Memory when SWM-eligible: reference count >= 3 in later memory files, or an explicit 'share:' frontmatter tag. The daemon's periodic tick (default 5 minutes) auto-shares eligible KAs; swm/share seals by default, making them publish-ready. 'curator share <ka>' remains available for explicit promotion. Verifiable Memory promotion is gated behind the interactive 'curator publish <ka>' CLI command with a y/n confirmation - never automatic. This deterministic WM -> SWM -> VM pipeline keeps promotion auditable and human-controlled.",
