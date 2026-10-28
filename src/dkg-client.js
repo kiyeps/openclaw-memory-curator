@@ -4,6 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { validateEndpointUrl } from './net-guard.js';
 
 export function loadToken(tokenPath) {
   const p = tokenPath || join(homedir(), '.dkg', 'auth.token');
@@ -34,7 +35,14 @@ export function escapeLiteral(str) {
 
 export class DkgClient {
   constructor({ baseUrl = 'http://127.0.0.1:9200', token, contextGraphId = 'openclaw-curator' } = {}) {
-    this.baseUrl = baseUrl.replace(/\/$/, '');
+    // Validate before the token is loaded or any request is built: the DKG
+    // bearer token must never be sent to an unexpected plaintext origin.
+    // Loopback http is allowed (local node); non-loopback requires https plus
+    // the explicit DKG_ALLOW_REMOTE_ENDPOINT=1 operator opt-in.
+    this.baseUrl = validateEndpointUrl(baseUrl, {
+      name: 'DKG_API_URL',
+      remoteOptInEnv: 'DKG_ALLOW_REMOTE_ENDPOINT',
+    });
     this.token = token || loadToken();
     this.cg = contextGraphId;
   }

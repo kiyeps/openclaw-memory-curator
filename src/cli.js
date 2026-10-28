@@ -145,7 +145,12 @@ async function cmdPublish(kaName, assumeYes = false) {
   const k = tracker.get(kaName);
   if (!k) { console.error('Unknown KA:', kaName); process.exit(1); }
   if (k.status !== 'swm') { console.error('KA not in SWM:', k.status); process.exit(1); }
-  console.log(`WARNING: This will publish ${kaName} to Verifiable Memory (on-chain).`);
+  // The tracker key is the stable base slug; the actual node KA name carries a
+  // timestamp suffix when the file was re-ingested (see cmdIngest). Resolve to
+  // the node name before touching the node, exactly as cmdShare does, so a
+  // re-ingested KA publishes under its live name instead of failing.
+  const nodeKa = k.slug || k.name;
+  console.log(`WARNING: This will publish ${nodeKa} to Verifiable Memory (on-chain).`);
   console.log('This is an explicit, irreversible action. Gas costs apply.');
   if (!assumeYes) {
     // Enforce the explicit human gate the security declaration promises: no
@@ -157,7 +162,7 @@ async function cmdPublish(kaName, assumeYes = false) {
     }
     const { createInterface } = await import('node:readline/promises');
     const rl = createInterface({ input: process.stdin, output: process.stdout });
-    const answer = (await rl.question(`Type "yes" to publish ${kaName} to Verifiable Memory: `))
+    const answer = (await rl.question(`Type "yes" to publish ${nodeKa} to Verifiable Memory: `))
       .trim().toLowerCase();
     rl.close();
     if (answer !== 'yes') {
@@ -166,7 +171,7 @@ async function cmdPublish(kaName, assumeYes = false) {
     }
   }
   console.log('Publishing...');
-  const res = await dkg.vmPublish(kaName);
+  const res = await dkg.vmPublish(nodeKa);
   tracker.setStatus(kaName, 'vm');
   tracker.save();
   console.log('Published:', JSON.stringify(res, null, 2));
